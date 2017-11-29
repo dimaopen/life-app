@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.embed.swing.SwingNode?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.Scene?>
+<Scene xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+       width="1024" height="768" fx:controller="lifeapp.ui.MainController">
+    <StackPane>
+        <SwingNode fx:id="swingNode"/>
+    </StackPane>
+</Scene>
