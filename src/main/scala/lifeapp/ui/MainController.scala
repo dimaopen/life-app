@@ -15,6 +15,8 @@ import org.piccolo2d.{PCamera, PCanvas, PNode}
   * @author Dmitry Openkov
   */
 class MainController(generation: Generation) {
+  private val INITIAL_NUMBER_CELLS_X = 80
+  private val INITIAL_NUMBER_CELLS_Y = 60
   var gen: Generation = generation
   private val gridLayer = new GridLayer()
   private val canvas: PCanvas = createCanvas
@@ -49,7 +51,8 @@ class MainController(generation: Generation) {
 
 
     val contentPane = new JPanel
-    contentPane.setPreferredSize(new Dimension(800, 600))
+    contentPane.setPreferredSize(new Dimension(INITIAL_NUMBER_CELLS_X * gridLayer.gridSpacing,
+      INITIAL_NUMBER_CELLS_Y * gridLayer.gridSpacing))
     contentPane.setLayout(new BorderLayout)
     contentPane.add(toolBar, BorderLayout.PAGE_START)
     contentPane.add(canvas, BorderLayout.CENTER)
@@ -97,12 +100,13 @@ class MainController(generation: Generation) {
     canvas
   }
 
-  def drawCells(canvas: PCanvas): Unit = {
+  private def drawCells(canvas: PCanvas): Unit = {
     canvas.getLayer.removeAllChildren()
     gen.cells.foreach((cell: Cell) => {
       val c = new PNode
       c.setPaint(Color.BLUE)
-      c.setBounds(cell.x * gridLayer.gridSpacing, cell.y * gridLayer.gridSpacing, gridLayer.gridSpacing, gridLayer.gridSpacing)
+      c.setBounds(cell.x * gridLayer.gridSpacing, (INITIAL_NUMBER_CELLS_Y - cell.y) * gridLayer.gridSpacing,
+        gridLayer.gridSpacing, gridLayer.gridSpacing)
       canvas.getLayer.addChild(c)
     })
   }
