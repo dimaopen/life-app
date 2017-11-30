@@ -14,7 +14,7 @@ class GridLayer extends PLayer {
   val gridLine = new Line2D.Double
   val gridStroke = new BasicStroke(1)
   val gridPaint: Color = Color.LIGHT_GRAY
-  val gridSpacing = 20
+  val gridSpacing = 10
 
   override protected def paint(paintContext: PPaintContext): Unit = {
     // make sure grid gets drawn on snap to grid boundaries. And

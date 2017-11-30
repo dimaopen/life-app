@@ -1,29 +1,13 @@
 package lifeapp.application
 
-import javafx.application.Application
-import javafx.fxml.FXMLLoader
-import javafx.scene.Scene
-import javafx.stage.Stage
+import lifeapp.life.{Cell, Generation}
+import lifeapp.ui.MainController
 
 
 /**
   *
   * @author Dmitry Openkov
   */
-class Executable extends Application {
-
-  override def start(primaryStage: Stage): Unit = {
-    val scene: Scene = FXMLLoader.load(getClass.getResource("/lifeapp/ui/MainScene.fxml"))
-    primaryStage.setScene(scene)
-    primaryStage.centerOnScreen()
-    primaryStage.show()
-  }
-}
-
-object Executable {
-
-  def main(args: Array[String]): Unit = {
-    Application.launch(classOf[Executable], args:_*)
-  }
-
+object Executable extends App {
+  new MainController(Generation(Cell.cells((10, 10), (11, 10), (14, 10), (15, 10), (16, 10), (13, 11), (11, 12))))
 }
