@@ -10,11 +10,11 @@ import org.piccolo2d.util.PPaintContext
   *
   * @author Dmitry Openkov
   */
-class GridLayer extends PLayer {
+class GridLayer(cellSize: Int) extends PLayer {
   val gridLine = new Line2D.Double
   val gridStroke = new BasicStroke(1)
   val gridPaint: Color = Color.LIGHT_GRAY
-  val gridSpacing = 10
+  val gridSpacing: Int = cellSize
 
   override protected def paint(paintContext: PPaintContext): Unit = {
     // make sure grid gets drawn on snap to grid boundaries. And

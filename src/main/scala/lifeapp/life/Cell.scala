@@ -22,8 +22,6 @@ case class Cell(x: Int, y: Int) {
 }
 
 object Cell {
-  def apply(x: Int, y: Int): Cell = new Cell(x, y)
-
   def cells(cells: (Int, Int)*): Set[Cell] = {
     cells.map(c => Cell(c._1, c._2)).toSet
   }
