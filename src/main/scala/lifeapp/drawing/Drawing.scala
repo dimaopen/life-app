@@ -5,7 +5,8 @@ import java.beans.{PropertyChangeEvent, PropertyChangeListener}
 
 import lifeapp.life.{Generation, LifeEngine}
 import org.piccolo2d.activities.PActivity
-import org.piccolo2d.{PCamera, PCanvas, PNode}
+import org.piccolo2d.extras.handles.PBoundsHandle
+import org.piccolo2d.{PCamera, PCanvas, PLayer, PNode}
 
 /**
   *
@@ -16,6 +17,7 @@ class Drawing(var generation: Generation) {
   private val INITIAL_NUMBER_CELLS_Y = 60
   private val BLOCK_SIZE = 10
   val initialSize = new Dimension(INITIAL_NUMBER_CELLS_X * BLOCK_SIZE, INITIAL_NUMBER_CELLS_Y * BLOCK_SIZE)
+  private val magnifier = new Magnifier()
   val canvas: PCanvas = createCanvas
   private val blockNode = new BlockNode(canvas.getLayer, BLOCK_SIZE, INITIAL_NUMBER_CELLS_Y)
   private val maxZoom = canvas.getCamera.getViewScale
@@ -43,6 +45,14 @@ class Drawing(var generation: Generation) {
     }
     camera.addPropertyChangeListener(PNode.PROPERTY_BOUNDS, listener)
     camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, listener)
+
+    magnifier.setBounds(10, 310, 200, 330)
+    magnifier.addLayer(0, canvas.getLayer)
+    magnifier.addLayer(1, gridLayer)
+    val lensLayer = new PLayer()
+    lensLayer.addChild(magnifier)
+    camera.addLayer(lensLayer)
+    PBoundsHandle.addBoundsHandlesTo(magnifier)
 
     canvas
   }
