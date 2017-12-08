@@ -46,12 +46,13 @@ class Drawing(var generation: Generation) {
     camera.addPropertyChangeListener(PNode.PROPERTY_BOUNDS, listener)
     camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, listener)
 
-    magnifier.setBounds(10, 310, 200, 330)
+    magnifier.setBounds(10, 310, 330, 330)
     magnifier.addLayer(0, canvas.getLayer)
     magnifier.addLayer(1, gridLayer)
-    val lensLayer = new PLayer()
-    lensLayer.addChild(magnifier)
-    camera.addLayer(lensLayer)
+    val magnifierLayer = new PLayer()
+    magnifierLayer.addChild(magnifier)
+    magnifierLayer.setVisible(false)
+    camera.addLayer(magnifierLayer)
     PBoundsHandle.addBoundsHandlesTo(magnifier)
 
     canvas
