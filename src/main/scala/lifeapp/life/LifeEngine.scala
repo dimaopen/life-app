@@ -1,5 +1,9 @@
 package lifeapp.life
 
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
+import io.reactivex.subjects.PublishSubject
+
 /**
   *
   * @author Dmitry Openkov
@@ -26,6 +30,20 @@ object LifeEngine {
     })
     Generation(cells.diff(dyingCells).union(newCells), generation.n + 1)
   }
+}
 
+class LifeEngine (var generation: Generation) {
+  private val stepSubject: PublishSubject[Generation] = PublishSubject.create()
+
+  def step(): Generation = {
+    val newGeneration = LifeEngine.step(generation)
+    generation = newGeneration
+    stepSubject.onNext(generation)
+    generation
+  }
+
+  def subscribe(consumer: Consumer[Generation]): Disposable = {
+    stepSubject.subscribe(consumer)
+  }
 
 }

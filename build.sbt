@@ -10,5 +10,6 @@ lazy val root = (project in file(".")).
     name := "life-app",
     libraryDependencies += piccolo2d % Compile,
     libraryDependencies += piccolo2d_extras % Compile,
+    libraryDependencies += rxJava % Compile,
     libraryDependencies += scalaTest % Test,
   )

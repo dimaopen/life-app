@@ -3,7 +3,7 @@ package lifeapp.drawing
 import java.awt.Dimension
 import java.beans.{PropertyChangeEvent, PropertyChangeListener}
 
-import lifeapp.life.{Generation, LifeEngine}
+import lifeapp.life.LifeEngine
 import org.piccolo2d.activities.PActivity
 import org.piccolo2d.extras.handles.PBoundsHandle
 import org.piccolo2d.{PCamera, PCanvas, PLayer, PNode}
@@ -12,7 +12,7 @@ import org.piccolo2d.{PCamera, PCanvas, PLayer, PNode}
   *
   * @author Dmitry Openkov
   */
-class Drawing(var generation: Generation) {
+class Drawing(var lifeEngine: LifeEngine) {
   private val INITIAL_NUMBER_CELLS_X = 80
   private val INITIAL_NUMBER_CELLS_Y = 60
   private val BLOCK_SIZE = 10
@@ -22,15 +22,15 @@ class Drawing(var generation: Generation) {
   private val blockNode = new BlockNode(canvas.getLayer, BLOCK_SIZE, INITIAL_NUMBER_CELLS_Y)
   private val maxZoom = canvas.getCamera.getViewScale
   private val minZoom = .125
-  blockNode.drawCells(generation)
+  blockNode.drawCells(lifeEngine.generation)
 
   private val mainCycle = new PActivity(-1L, 200, System.currentTimeMillis()) {
     override protected def activityStep(elapsedTime: Long): Unit = {
       super.activityStep(elapsedTime)
-      generation = LifeEngine.step(generation)
-      blockNode.drawCells(generation)
+      blockNode.drawCells(lifeEngine.step())
     }
   }
+
 
   private def createCanvas = {
     val canvas = new PCanvas
@@ -90,5 +90,6 @@ class Drawing(var generation: Generation) {
     if (!isRunning) {
       canvas.getRoot.addActivity(mainCycle)
     }
+
   }
 }

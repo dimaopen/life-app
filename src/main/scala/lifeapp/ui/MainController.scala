@@ -1,19 +1,25 @@
 package lifeapp.ui
 
-import java.awt.BorderLayout
 import java.awt.event.ActionEvent
-import javax.swing._
+import java.awt.{BorderLayout, Dimension}
+import javax.swing.border.BevelBorder
+import javax.swing.{BoxLayout, JFrame, JLabel, JPanel, SwingConstants, _}
 
+import io.reactivex.functions.Consumer
 import lifeapp.drawing.Drawing
-import lifeapp.life.Generation
+import lifeapp.life.{Generation, LifeEngine}
 
 /**
   *
   * @author Dmitry Openkov
   */
-class MainController(generation: Generation) {
-  private val drawing: Drawing = new Drawing(generation)
+class MainController(lifeEngine: LifeEngine) {
+  private val drawing: Drawing = new Drawing(lifeEngine)
+  val statusLabel = new JLabel()
   SwingUtilities.invokeLater(() => createAndShowGUI(createPanel()))
+  lifeEngine.subscribe((g: Generation) => {
+    statusLabel.setText(s"# ${g.n}, number of cells ${g.cells.size}")
+  })
 
   private def createPanel(): JPanel = {
     // create a toolbar
@@ -39,6 +45,15 @@ class MainController(generation: Generation) {
     contentPane.setLayout(new BorderLayout)
     contentPane.add(toolBar, BorderLayout.PAGE_START)
     contentPane.add(drawing.canvas, BorderLayout.CENTER)
+
+    val statusPanel = new JPanel
+    statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED))
+    contentPane.add(statusPanel, BorderLayout.SOUTH)
+    statusPanel.setPreferredSize(new Dimension(contentPane.getWidth, 20))
+    statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS))
+    statusLabel.setHorizontalAlignment(SwingConstants.LEFT)
+    statusPanel.add(statusLabel)
+
     contentPane
   }
 
@@ -65,8 +80,6 @@ class MainController(generation: Generation) {
     })
     button
   }
-
-  import javax.swing.JFrame
 
   private def createAndShowGUI(value: JComponent): Unit = {
     val frame = new JFrame("Game of Life")
