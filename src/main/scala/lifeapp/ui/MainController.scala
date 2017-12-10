@@ -1,12 +1,11 @@
 package lifeapp.ui
 
-import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 import java.awt.{BorderLayout, Dimension}
 import javax.swing.border.BevelBorder
 import javax.swing.{BoxLayout, JFrame, JLabel, JPanel, SwingConstants, _}
 
-import io.reactivex.functions.Consumer
-import lifeapp.drawing.Drawing
+import lifeapp.drawing.{Drawing, DrawingEvent}
 import lifeapp.life.{Generation, LifeEngine}
 
 /**
@@ -16,27 +15,45 @@ import lifeapp.life.{Generation, LifeEngine}
 class MainController(lifeEngine: LifeEngine) {
   private val drawing: Drawing = new Drawing(lifeEngine)
   val statusLabel = new JLabel()
+
+  private val stepButton = createButton("Step Forward", "media/StepForward", _ => drawing.step())
+  private val playButton = createButton("Play", "media/Play", _ =>
+    if (drawing.isRunning) {
+      drawing.stop()
+    } else {
+      drawing.play()
+    }
+  )
+  private val fastForwardButton = createButton("Fast Forward", "media/FastForward", _ => drawing.fastForward())
+  private val zoomInButton = createButton("Zoom In", "general/ZoomIn", _ => drawing.zoomIn())
+  private val zoomOutButton = createButton("Zoom Out", "general/ZoomOut", _ => drawing.zoomOut())
+  private val playIcon = playButton.getIcon
+  private val pauseIcon: ImageIcon = createIcon("media/Pause")
+
   SwingUtilities.invokeLater(() => createAndShowGUI(createPanel()))
   lifeEngine.subscribe((g: Generation) => {
-    statusLabel.setText(s"# ${g.n}, number of cells ${g.cells.size}")
+    statusLabel.setText(s"# ${g.n}; population ${g.cells.size}")
   })
+  drawing.subscribe {
+    case DrawingEvent.Play => playButton.setIcon(pauseIcon)
+    case DrawingEvent.Stop => playButton.setIcon(playIcon)
+    case DrawingEvent.InitialRate => fastForwardButton.setEnabled(true)
+    case DrawingEvent.MaxRate => fastForwardButton.setEnabled(false)
+    case DrawingEvent.MaxZoom => zoomInButton.setEnabled(false)
+    case DrawingEvent.MinZoom => zoomOutButton.setEnabled(false)
+    case DrawingEvent.IntermediateZoom => zoomInButton.setEnabled(true); zoomOutButton.setEnabled(true)
+  }
 
   private def createPanel(): JPanel = {
     // create a toolbar
     val toolBar = new JToolBar
-    val start = createStartButton
 
-    val zoomIn = new JButton(createIcon("general/ZoomIn"))
-    zoomIn.addActionListener((e: ActionEvent) => drawing.zoomIn())
-    val zoomOut = new JButton(createIcon("general/ZoomOut"))
-    zoomOut.addActionListener((e: ActionEvent) => drawing.zoomOut())
-    val buttonGroup = new ButtonGroup
-    buttonGroup.add(start)
-    buttonGroup.add(zoomIn)
-    buttonGroup.add(zoomOut)
-    toolBar.add(start)
-    toolBar.add(zoomIn)
-    toolBar.add(zoomOut)
+    toolBar.add(stepButton)
+    toolBar.add(playButton)
+    toolBar.add(fastForwardButton)
+    toolBar.addSeparator()
+    toolBar.add(zoomInButton)
+    toolBar.add(zoomOutButton)
     toolBar.setFloatable(true)
 
 
@@ -63,21 +80,13 @@ class MainController(lifeEngine: LifeEngine) {
     icon
   }
 
-  private def createStartButton = {
-
-    val playIcon: ImageIcon = createIcon("media/Play")
-    val pauseIcon: ImageIcon = createIcon("media/Pause")
-    val button = new JButton(playIcon)
-    button.setToolTipText("Play")
-    button.addActionListener((e: ActionEvent) => {
-      if (drawing.isRunning) {
-        drawing.stop()
-        button.setIcon(playIcon)
-      } else {
-        drawing.play()
-        button.setIcon(pauseIcon)
-      }
-    })
+  private def createButton(tooltip: String, iconName: String, listener: ActionListener = null) = {
+    val button = new JButton(createIcon(iconName))
+    button.setToolTipText(tooltip)
+    button.setFocusPainted(false)
+    if (listener != null) {
+      button.addActionListener(listener)
+    }
     button
   }
 
