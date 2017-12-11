@@ -1,6 +1,7 @@
 package lifeapp.drawing
 
 import java.awt.Dimension
+import java.awt.geom.Point2D
 import java.beans.{PropertyChangeEvent, PropertyChangeListener}
 
 import io.reactivex.disposables.Disposable
@@ -93,7 +94,8 @@ class Drawing(var lifeEngine: LifeEngine) {
   }
 
   private def getViewCenter = {
-    canvas.getCamera.getBounds.getCenter2D
+    val c = new Point2D.Double(canvas.getBounds().getCenterX, canvas.getBounds().getCenterY)
+    canvas.getCamera.localToView(c)
   }
 
   private def doStep(): Unit = {
