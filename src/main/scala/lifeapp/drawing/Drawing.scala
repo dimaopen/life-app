@@ -8,7 +8,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.subjects.ReplaySubject
 import lifeapp.drawing.DrawingEvent.DrawingEvent
-import lifeapp.life.{Cell, LifeEngine}
+import lifeapp.life.{Cell, Generation, LifeEngine}
 import org.piccolo2d.activities.PActivity
 import org.piccolo2d.event.{PBasicInputEventHandler, PInputEvent}
 import org.piccolo2d.{PCamera, PCanvas, PNode}
@@ -28,9 +28,7 @@ class Drawing(var lifeEngine: LifeEngine) {
   gridLayer.addInputEventListener(new PBasicInputEventHandler {
     override def mouseClicked(event: PInputEvent): Unit = {
       val cell = gridLayer.getCellFromPoint(event.getPosition)
-      println(s"cell = $cell")
       lifeEngine.toggle(Cell(cell._1, cell._2))
-      blockNode.drawCells(lifeEngine.generation)
     }
   })
   val canvas: PCanvas = createCanvas
@@ -97,7 +95,7 @@ class Drawing(var lifeEngine: LifeEngine) {
   }
 
   private def doStep(): Unit = {
-    blockNode.drawCells(lifeEngine.step())
+    lifeEngine.step()
   }
 
   def isRunning: Boolean = mainCycle.isStepping
@@ -141,7 +139,7 @@ class Drawing(var lifeEngine: LifeEngine) {
   }
 
   def shown(): Unit = {
-    blockNode.drawCells(lifeEngine.generation)
+    lifeEngine.subscribe((t: Generation) => blockNode.drawCells(lifeEngine.generation))
   }
 }
 
