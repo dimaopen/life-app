@@ -2,7 +2,7 @@ package lifeapp.life
 
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.{ReplaySubject, Subject}
 
 /**
   *
@@ -33,7 +33,8 @@ object LifeEngine {
 }
 
 class LifeEngine (var generation: Generation) {
-  private val stepSubject: PublishSubject[Generation] = PublishSubject.create()
+  private val stepSubject: Subject[Generation] = ReplaySubject.create[Generation](1)
+  stepSubject.onNext(generation)
 
   def step(): Generation = {
     val newGeneration = LifeEngine.step(generation)

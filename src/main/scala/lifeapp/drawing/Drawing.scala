@@ -18,7 +18,7 @@ import org.piccolo2d.{PCamera, PCanvas, PLayer, PNode}
   * @author Dmitry Openkov
   */
 class Drawing(var lifeEngine: LifeEngine) {
-  private val subject = ReplaySubject.create[DrawingEvent]()
+  private val subject = ReplaySubject.create[DrawingEvent](10)
   private val INITIAL_NUMBER_CELLS_X = 80
   private val INITIAL_NUMBER_CELLS_Y = 60
   private val BLOCK_SIZE = 10
