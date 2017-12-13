@@ -29,7 +29,19 @@ object Cell {
 
 case class Generation(cells: Set[Cell], n: Int, xMin: Int, yMin: Int, xMax: Int, yMax: Int) {
   def +(cell: Cell): Generation = {
-    Generation(cells + cell, 0, min(xMin, cell.x), min(yMin, cell.y), max(xMax, cell.x), max(yMax, cell.y))
+    if (!cells.contains(cell)) {
+      Generation(cells + cell, 0, min(xMin, cell.x), min(yMin, cell.y), max(xMax, cell.x), max(yMax, cell.y))
+    } else {
+      this
+    }
+  }
+
+  def -(cell: Cell): Generation = {
+    if (cells.contains(cell)) {
+      Generation(cells - cell, 0, min(xMin, cell.x), min(yMin, cell.y), max(xMax, cell.x), max(yMax, cell.y))
+    } else {
+      this
+    }
   }
 }
 

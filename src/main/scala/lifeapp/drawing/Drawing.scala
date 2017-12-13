@@ -8,28 +8,36 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.subjects.ReplaySubject
 import lifeapp.drawing.DrawingEvent.DrawingEvent
-import lifeapp.life.LifeEngine
+import lifeapp.life.{Cell, LifeEngine}
 import org.piccolo2d.activities.PActivity
-import org.piccolo2d.extras.handles.PBoundsHandle
-import org.piccolo2d.{PCamera, PCanvas, PLayer, PNode}
+import org.piccolo2d.event.{PBasicInputEventHandler, PInputEvent}
+import org.piccolo2d.{PCamera, PCanvas, PNode}
 
 /**
   *
   * @author Dmitry Openkov
   */
 class Drawing(var lifeEngine: LifeEngine) {
+
   private val subject = ReplaySubject.create[DrawingEvent](10)
   private val INITIAL_NUMBER_CELLS_X = 80
   private val INITIAL_NUMBER_CELLS_Y = 60
   private val BLOCK_SIZE = 10
   val initialSize = new Dimension(INITIAL_NUMBER_CELLS_X * BLOCK_SIZE, INITIAL_NUMBER_CELLS_Y * BLOCK_SIZE)
-  private val magnifier = new Magnifier()
+  val gridLayer = new GridLayer(BLOCK_SIZE)
+  gridLayer.addInputEventListener(new PBasicInputEventHandler {
+    override def mouseClicked(event: PInputEvent): Unit = {
+      val cell = gridLayer.getCellFromPoint(event.getPosition)
+      println(s"cell = $cell")
+      lifeEngine.toggle(Cell(cell._1, cell._2))
+      blockNode.drawCells(lifeEngine.generation)
+    }
+  })
   val canvas: PCanvas = createCanvas
-  private val blockNode = new BlockNode(canvas.getLayer, BLOCK_SIZE, INITIAL_NUMBER_CELLS_Y)
+  private val blockNode = new BlockNode(canvas.getCamera.getLayer(0), gridLayer)
   private val maxZoom = canvas.getCamera.getViewScale
   private val minZoom = .125
   private val INITIAL_STEP_RATE = 500
-  blockNode.drawCells(lifeEngine.generation)
   subject.onNext(DrawingEvent.InitialRate)
   subject.onNext(DrawingEvent.MaxZoom)
 
@@ -43,7 +51,6 @@ class Drawing(var lifeEngine: LifeEngine) {
   private def createCanvas = {
     val canvas = new PCanvas
     val camera = canvas.getCamera
-    val gridLayer = new GridLayer(BLOCK_SIZE)
     camera.addLayer(gridLayer)
 
     val listener = new PropertyChangeListener() {
@@ -53,15 +60,6 @@ class Drawing(var lifeEngine: LifeEngine) {
     }
     camera.addPropertyChangeListener(PNode.PROPERTY_BOUNDS, listener)
     camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, listener)
-
-    magnifier.setBounds(10, 310, 330, 330)
-    magnifier.addLayer(0, canvas.getLayer)
-    magnifier.addLayer(1, gridLayer)
-    val magnifierLayer = new PLayer()
-    magnifierLayer.addChild(magnifier)
-    magnifierLayer.setVisible(false)
-    camera.addLayer(magnifierLayer)
-    PBoundsHandle.addBoundsHandlesTo(magnifier)
 
     canvas
   }
@@ -140,6 +138,10 @@ class Drawing(var lifeEngine: LifeEngine) {
 
   def subscribe(consumer: Consumer[DrawingEvent]): Disposable = {
     subject.subscribe(consumer)
+  }
+
+  def shown(): Unit = {
+    blockNode.drawCells(lifeEngine.generation)
   }
 }
 

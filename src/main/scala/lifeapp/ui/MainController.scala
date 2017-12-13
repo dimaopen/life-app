@@ -1,6 +1,6 @@
 package lifeapp.ui
 
-import java.awt.event.ActionListener
+import java.awt.event.{ActionListener, ComponentAdapter, ComponentEvent}
 import java.awt.{BorderLayout, Dimension}
 import javax.swing.border.BevelBorder
 import javax.swing.{BoxLayout, JFrame, JLabel, JPanel, SwingConstants, _}
@@ -92,6 +92,12 @@ class MainController(lifeEngine: LifeEngine) {
 
   private def createAndShowGUI(value: JComponent): Unit = {
     val frame = new JFrame("Game of Life")
+
+    frame.addComponentListener(new ComponentAdapter {
+      override def componentShown(e: ComponentEvent): Unit = {
+        drawing.shown()
+      }
+    })
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.add(value)
     frame.pack()

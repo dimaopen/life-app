@@ -32,15 +32,27 @@ object LifeEngine {
   }
 }
 
-class LifeEngine (var generation: Generation) {
+class LifeEngine (private val initialGeneration: Generation) {
+  private var gen = initialGeneration
   private val stepSubject: Subject[Generation] = ReplaySubject.create[Generation](1)
-  stepSubject.onNext(generation)
+  stepSubject.onNext(gen)
+
+  def generation: Generation = gen
 
   def step(): Generation = {
-    val newGeneration = LifeEngine.step(generation)
-    generation = newGeneration
-    stepSubject.onNext(generation)
-    generation
+    val newGeneration = LifeEngine.step(gen)
+    gen = newGeneration
+    stepSubject.onNext(gen)
+    gen
+  }
+
+  def toggle(cell: Cell): Unit = {
+    if (gen.cells.contains(cell)) {
+      gen = generation - cell
+    } else {
+      gen = generation + cell
+    }
+    stepSubject.onNext(gen)
   }
 
   def subscribe(consumer: Consumer[Generation]): Disposable = {

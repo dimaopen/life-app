@@ -1,6 +1,7 @@
 package lifeapp.drawing
 
 import java.awt.Color
+import java.awt.geom.Rectangle2D
 
 import lifeapp.life.{Cell, Generation}
 import org.piccolo2d.PNode
@@ -9,14 +10,15 @@ import org.piccolo2d.PNode
   *
   * @author Dmitry Openkov
   */
-class BlockNode(pNode: PNode, blockSize: Int, viewHeight: Int) {
+class BlockNode(pNode: PNode, gridLayer: GridLayer) {
 
   def drawCells(generation: Generation): Unit = {
     pNode.removeAllChildren()
     generation.cells.foreach((cell: Cell) => {
       val c = new PNode
       c.setPaint(Color.BLUE)
-      c.setBounds(cell.x * blockSize, (viewHeight - cell.y) * blockSize, blockSize, blockSize)
+      val cellRectangle: Rectangle2D = gridLayer.getCellRectangle(cell.x, cell.y)
+      c.setBounds(cellRectangle)
       pNode.addChild(c)
     })
   }
